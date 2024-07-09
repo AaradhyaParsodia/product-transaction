@@ -6,12 +6,14 @@ export async function getAllTransactions(req, res){
     const { search } = req.query || " ";
     const {offset} = req.query;
     const {limit} = req.query;
+    const { selectedMonth } = req.query || "March";
     // console.log(offset+ " "+ limit);
     try {
         let filteredData;
         if(search){
             filteredData = await prisma.product_transactions.findMany({
                 where: {
+                    
                     OR: [
                         {
                             title: {
@@ -26,8 +28,10 @@ export async function getAllTransactions(req, res){
                             }
                         },
                         ...(isNaN(Number(search)) ? [] : [{ price: parseInt(search) }]),
-    
-                    ]
+                    ],
+                    AND: {
+                        month: selectedMonth,
+                    },
                 },
                 skip: parseInt(offset*limit) || 0,
                 take: parseInt(limit) || 10
